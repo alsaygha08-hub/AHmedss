@@ -172,6 +172,7 @@ font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans
 <!-- Local questions mode (no Blackboard) -->
 <script src="./prompts_local.js"></script>
 <script>
+	
 (function(){
   function initLocal(){
     window.promptBank = (window.PROMPTS_LOCAL || []).slice();
@@ -187,6 +188,14 @@ font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans
   }
   window.addEventListener('load', initLocal);
 })();
+</script>
+<script>
+window.onerror = function(msg, src, line, col){
+  const d=document.createElement('pre');
+  d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;background:#111;color:#0f0;padding:8px;z-index:99999;font:12px/1.4 monospace;white-space:pre-wrap;';
+  d.textContent = 'JS Error: '+msg+'\n'+src+':'+line+':'+col;
+  document.body.appendChild(d);
+};
 </script>
 
 </body> 
