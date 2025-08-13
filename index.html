@@ -1,202 +1,65 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ar">
 <head>
-<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-<title>English 3 Speaking Milestone 3</title>
-<!-- <script type="text/javascript" src="prompts.js"></script> -->
-<script type="text/javascript" src="jquery-3.6.4.min.js"></script>
-<script type="text/javascript" src="jquery-ui.min.js"></script>
-<script type="text/javascript" src="jquery.ui.touch-punch.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English 3 Offline</title>
+    <link rel="stylesheet" href="./jquery-ui.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f5f5f5;
+        }
+        #overlay {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay">جار التحميل...</div>
 
-<style>
-.promptHolder {
-background-color: #f7f7f7;
-border: 2px solid #EBEBEB;
-color: #468283;
-font-size: calc(1.75vw + 1.75vh);
-vertical-align: middle;
-width: 90%;
-border-radius: 10px;
-margin: auto;
-font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-/* display: flex; */
-  justify-content: center;
-  align-items: center;
-  padding: 1em;
-  /* min-height: 50vh; */
-}
-#pageHead {
-	color: #468283;
-	font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
-}
+    <h1>English 3</h1>
+    <p id="pto"></p>
+    <button id="butt2" style="display:none;">التالي</button>
 
-#closeX {
-	cursor: pointer;
-}
-#cont {
+    <!-- مكتبات أساسية -->
+    <script src="./jquery-3.6.4.min.js"></script>
+    <script src="./jquery-ui.min.js"></script>
+    <script src="./jquery.ui.touch-punch.min.js"></script>
 
-	text-align: center; 
-	height: 95vh; 
-	width: 95vw; 
-	overflow: scroll; 
-	margin: auto;
-}
-#overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.butt {
- background-color: #84BD00;
- color: white;
- border-radius: 6px;
- width: 100px;
- left: 50%;
- transform: translateX(-50%) translateZ(0);
- padding: 10px;
- text-align: center;
- font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
- font-size: 1.5em;
- box-shadow: 0 2px 5px rgba(0,0,0,0.3);
- position: fixed;
- bottom: 20px;
- cursor: pointer;
-}
-.pCount {
+    <!-- ملف الأسئلة المحلي -->
+    <script src="./prompts_local.js"></script>
 
-width:93vw; 
-text-align: center; 
-font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+    <!-- كود التشغيل -->
+    <script>
+        function initLocal() {
+            if (!window.PROMPTS_LOCAL || !window.PROMPTS_LOCAL.length) {
+                console.error("❌ ملف الأسئلة prompts_local.js غير محمّل أو فاضي");
+                alert("خطأ: ملف الأسئلة غير موجود أو فاضي");
+                return;
+            }
 
-}
+            window.promptBank = window.PROMPTS_LOCAL.slice(0, 12);
+            window.sounds = promptBank.map((p, i) => './' + (p.audio ? p.audio : ('g' + (i + 1) + '.mp3')));
+            window.audioElements = sounds.map(f => {
+                const a = new Audio(f);
+                a.onended = () => $("#butt2").fadeIn();
+                return a;
+            });
 
-.zoom {
-	position: absolute;
-	top: 5px;
-	left: 5px;
-	width: 100vw;
-	height: 100vh;
-	background-color: rgba(255,255,255, 0.9);
-	z-index: 999;
-}
+            $("#pto").text("عدد الأسئلة: " + promptBank.length);
+            document.getElementById("overlay").style.display = "none";
+        }
 
-.butt:active {
- 
-  transform: translateX(-50%) translateZ(0) scale(0.96);
-  /* Scaling button to 0.98 to its original size */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  /* Lowering the shadow */
-    
-}
-
-#imageHolder {
-	width: 90%; 
-	justify-content: center; 
-	cursor: pointer; 
-	display: none;
-	margin: auto;
-	overflow: visible;
-	
-}
-
-#promptPic {
-	display: block; 
-	margin-left: auto; 
-	margin-right: auto; 
-	margin-top: 10px; 
-	margin-bottom: 10px; 
-	max-width: 250px;
-	max-height: 150px; 
-	box-shadow: 0 2px 2px rgba(0,0,0,0.3);
-	cursor: pointer;
-}
-@media only screen and (max-width: 750px) {
-  .promptHolder{
-    font-size: 2em;
-	width: 85%;
-  }
-  .pCount {
-	width: 85%;
-	padding-left: 5rem;
-
-  }
- 
-}
-
-@media only screen and (max-width: 500px) {
-  /* .promptHolder{
-    font-size: 1rem;
-	
-  } */
-  .pCount {
-	
-	padding-left: 3rem;
-
-  }
-  #promptPic {
-	max-width: 150px;
-  }
-}
-
-</style>
-
-<script>
-// v17: Bind audio unlock/play to original Continue button
-(function(){
-  function prime(a){ try{ a.muted=true; a.play().then(()=>{a.pause();a.currentTime=0;a.muted=false;}).catch(()=>{});}catch(e){} }
-  function safePlay(a){ try{ a.currentTime=0; a.muted=false; a.play().catch(()=>{});}catch(e){} }
-  window.addEventListener('DOMContentLoaded', function(){
-    const cont = document.getElementById('butt'); // original Continue
-    if (!cont) return;
-    if (cont._bound) return; cont._bound = true;
-    cont.addEventListener('click', function(){
-      // prime possible audio elements
-      [window.badge, window.instr, window.endBlurb, window.tgtPhrase].forEach(x=>{ if(x) prime(x); });
-      // explicitly play intro if available
-      if (window.badge) safePlay(window.badge);
-      // let original handler run normally
-    }, {capture:true}); // capture to run before original onclick
-  }, {once:true});
-})();
-</script>
-
-
-<!-- Local questions mode (no Blackboard) -->
-<script src="./prompts_local.js"></script>
-<script>
-	
-(function(){
-  function initLocal(){
-    window.promptBank = (window.PROMPTS_LOCAL || []).slice();
-    window.sounds = promptBank.map(p => './' + (p.audio || '').replace(/^\.?\/?/, ''));
-    window.audioElements = sounds.map(function(file){
-      var a = new Audio(file);
-      a.onended = function(){ $('#butt2').fadeIn(); };
-      return a;
-    });
-    $('#pto').text(promptBank.length);
-    $('#pCount').hide();
-    var ov=document.getElementById('overlay'); if(ov) ov.style.display='none';
-  }
-  window.addEventListener('load', initLocal);
-})();
-</script>
-<script>
-window.onerror = function(msg, src, line, col){
-  const d=document.createElement('pre');
-  d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;background:#111;color:#0f0;padding:8px;z-index:99999;font:12px/1.4 monospace;white-space:pre-wrap;';
-  d.textContent = 'JS Error: '+msg+'\n'+src+':'+line+':'+col;
-  document.body.appendChild(d);
-};
-</script>
-
-</body> 
+        window.addEventListener("load", initLocal);
+    </script>
+</body>
 </html>
